@@ -1,11 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { createJob, deleteJob, readJobs, updateJob } from "./jobAPI";
+import {
+  createJob,
+  deleteJob,
+  readJobs,
+  updateJob,
+  readSingleJob,
+} from "./jobAPI";
 
 const initialState = {
   isLoading: false,
   isError: false,
   error: "",
   jobs: [],
+  editing: {},
 };
 
 export const addJob = createAsyncThunk("jobs/addJob", async (data) => {
@@ -19,6 +26,15 @@ export const fetchJobs = createAsyncThunk("jobs/fetchJobs", async () => {
 
   return jobs;
 });
+
+export const fetchSingleJob = createAsyncThunk(
+  "jobs/getSingleJob",
+  async (id) => {
+    const job = await readSingleJob(id);
+
+    return job;
+  }
+);
 
 export const editJob = createAsyncThunk(
   "jobs/editJobs",
@@ -55,6 +71,7 @@ const jobSlice = createSlice({
         state.isError = false;
         state.error = action.error?.message;
         state.jobs = [];
+        state.editing = {};
       })
       .addCase(fetchJobs.pending, (state) => {
         state.isLoading = true;
@@ -71,6 +88,24 @@ const jobSlice = createSlice({
         state.isError = false;
         state.error = action.error?.message;
         state.jobs = [];
+        state.editing = {};
+      })
+      .addCase(fetchSingleJob.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.error = "";
+      })
+      .addCase(fetchSingleJob.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.editing = action.payload;
+      })
+      .addCase(fetchSingleJob.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.error = action.error?.message;
+        state.jobs = [];
+        state.editing = {};
       })
       .addCase(removeJob.pending, (state) => {
         state.isLoading = true;
@@ -87,6 +122,7 @@ const jobSlice = createSlice({
         state.isError = false;
         state.error = action.error?.message;
         state.jobs = [];
+        state.editing = {};
       });
   },
 });

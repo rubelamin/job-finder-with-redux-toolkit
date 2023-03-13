@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { editJob } from "../features/jobs/jobSlice";
+import { editJob, fetchSingleJob } from "../features/jobs/jobSlice";
+import moment from "moment";
 
 export default function EditJob() {
   const params = useParams();
   const { jobId } = params;
   const navigate = useNavigate();
-  const { jobs } = useSelector((state) => state.jobs);
+  const { editing } = useSelector((state) => state.jobs);
   const dispatch = useDispatch();
+
+  const [jobs, setJobs] = useState([]);
 
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
@@ -16,12 +19,27 @@ export default function EditJob() {
   const [deadline, setDeadLine] = useState("");
 
   useEffect(() => {
+    dispatch(fetchSingleJob(jobId));
+  }, [dispatch, jobId]);
+
+  useEffect(() => {
+    setJobs([editing]);
+  }, [editing]);
+
+  useEffect(() => {
     if (jobs?.length > 0) {
       const job = jobs.find((job) => job.id === Number(jobId));
-      setTitle(job.title);
-      setType(job.type);
-      setSalary(job.salary);
-      setDeadLine(job.deadline);
+      setTitle(job?.title);
+      setType(job?.type);
+      setSalary(job?.salary);
+      // console.log(moment(job?.deadline).format("YYYY-MM-DD"));
+      if (moment(job?.deadline).format("YYYY-MM-DD") === "Invalid date") {
+        let d = new Date();
+        d.setDate(d.getDate() + 10);
+        setDeadLine(moment(d).format("YYYY-MM-DD"));
+      } else {
+        setDeadLine(moment(job?.deadline).format("YYYY-MM-DD"));
+      }
     }
   }, [jobs, jobId]);
 

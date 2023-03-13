@@ -12,6 +12,12 @@ export const readJobs = async () => {
   return response.data;
 };
 
+export const readSingleJob = async (id) => {
+  const response = await axios.get(`/jobs/${id}`);
+  // console.log(response.data);
+  return response.data;
+};
+
 export const updateJob = async (id, data) => {
   const response = await axios.put(`/jobs/${id}`, data);
 
