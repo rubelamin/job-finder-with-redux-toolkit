@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addJob } from "../../features/jobs/jobSlice";
 
 export default function AddNewJob() {
   const dispatch = useDispatch();
+  const { isLoading, isError } = useSelector((state) => state.jobs);
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
@@ -29,12 +30,14 @@ export default function AddNewJob() {
   };
 
   const formReset = () => {
-    setTitle("");
-    setType("");
-    setSalary("");
-    setDeadLine("");
+    if (!isLoading && !isError) {
+      setTitle("");
+      setType("");
+      setSalary("");
+      setDeadLine("");
 
-    navigate("/");
+      navigate("/");
+    }
   };
 
   return (
@@ -125,6 +128,7 @@ export default function AddNewJob() {
 
             <div className="text-right">
               <button
+                disabled={isLoading}
                 type="submit"
                 id="lws-submit"
                 className="cursor-pointer btn btn-primary w-fit"

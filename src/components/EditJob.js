@@ -8,7 +8,7 @@ export default function EditJob() {
   const params = useParams();
   const { jobId } = params;
   const navigate = useNavigate();
-  const { editing } = useSelector((state) => state.jobs);
+  const { editing, isLoading, isError } = useSelector((state) => state.jobs);
   const dispatch = useDispatch();
 
   const [jobs, setJobs] = useState([]);
@@ -65,12 +65,14 @@ export default function EditJob() {
   };
 
   const formReset = () => {
-    setTitle("");
-    setType("");
-    setSalary("");
-    setDeadLine("");
+    if (!isLoading && !isError) {
+      setTitle("");
+      setType("");
+      setSalary("");
+      setDeadLine("");
 
-    navigate("/");
+      navigate("/");
+    }
   };
 
   return (
@@ -163,6 +165,7 @@ export default function EditJob() {
 
             <div className="text-right">
               <button
+                disabled={isLoading}
                 type="submit"
                 id="lws-submit"
                 className="cursor-pointer btn btn-primary w-fit"
